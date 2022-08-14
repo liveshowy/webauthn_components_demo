@@ -3,6 +3,7 @@ defmodule DemoWeb.Live.Auth do
   LiveView for registering and authenticating users.
   """
   use DemoWeb, :live_view
+  require Logger
 
   def mount(_params, _session, socket) do
     {
@@ -29,7 +30,7 @@ defmodule DemoWeb.Live.Auth do
     # TODO: Persist the user
     # TODO: Create a session
     # TODO: Assign @current_user to socket
-    IO.inspect(username, label: :register_user)
+    Logger.info({:register_user, username: username})
     {
       :noreply,
       socket
@@ -41,7 +42,7 @@ defmodule DemoWeb.Live.Auth do
     # TODO: Get user by username
     # TODO: Create a session
     # TODO: Assign @current_user to socket
-    IO.inspect(username, label: :authenticate_user)
+    Logger.info({:authenticate_user, username: username})
     {
       :noreply,
       socket
