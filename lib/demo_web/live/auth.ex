@@ -3,13 +3,13 @@ defmodule DemoWeb.Live.Auth do
   LiveView for registering and authenticating users.
   """
   use DemoWeb, :live_view
-  alias WebAuthnLiveComponent.Form
 
   def mount(_params, _session, socket) do
     {
       :ok,
       socket
       |> assign(:page_title, "Authentication")
+      |> assign_new(:user, fn -> nil end)
     }
   end
 
@@ -22,6 +22,7 @@ defmodule DemoWeb.Live.Auth do
       authenticate_label="Sign In"
       register_label="New Account"
       app={:demo}
+      user={@user}
       />
     """
   end
@@ -47,6 +48,16 @@ defmodule DemoWeb.Live.Auth do
       :noreply,
       socket
       |> put_flash(:info, "Authenticate #{username}")
+    }
+  end
+
+  def handle_info({:find_user_by_username, username: username}, socket) do
+    user = %{username: username, id: 1234, keys: []}
+
+    {
+      :noreply,
+      socket
+      |> assign(:user, user)
     }
   end
 end
