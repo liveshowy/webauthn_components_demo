@@ -30,7 +30,7 @@ defmodule DemoWeb.Live.Auth do
     # TODO: Persist the user
     # TODO: Create a session
     # TODO: Assign @current_user to socket
-    Logger.info({:register_user, username: username})
+    Logger.info(register_user: {__MODULE__, username})
     {
       :noreply,
       socket
@@ -42,7 +42,7 @@ defmodule DemoWeb.Live.Auth do
     # TODO: Get user by username
     # TODO: Create a session
     # TODO: Assign @current_user to socket
-    Logger.info({:authenticate_user, username: username})
+    Logger.info(authenticate_user: {__MODULE__, username})
     {
       :noreply,
       socket
@@ -52,6 +52,7 @@ defmodule DemoWeb.Live.Auth do
 
   def handle_info({:find_user_by_username, username: username}, socket) do
     # TODO: perform a real user lookup
+    Logger.info(find_user_by_username: {__MODULE__, username})
     user = %{username: username, id: 1234, keys: []}
     send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
     {:noreply,socket}
