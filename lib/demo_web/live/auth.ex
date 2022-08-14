@@ -9,7 +9,6 @@ defmodule DemoWeb.Live.Auth do
       :ok,
       socket
       |> assign(:page_title, "Authentication")
-      |> assign_new(:user, fn -> nil end)
     }
   end
 
@@ -22,7 +21,6 @@ defmodule DemoWeb.Live.Auth do
       authenticate_label="Sign In"
       register_label="New Account"
       app={:demo}
-      user={@user}
       />
     """
   end
@@ -52,12 +50,9 @@ defmodule DemoWeb.Live.Auth do
   end
 
   def handle_info({:find_user_by_username, username: username}, socket) do
+    # TODO: perform a real user lookup
     user = %{username: username, id: 1234, keys: []}
-
-    {
-      :noreply,
-      socket
-      |> assign(:user, user)
-    }
+    send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
+    {:noreply,socket}
   end
 end
