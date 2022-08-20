@@ -50,7 +50,7 @@ defmodule Demo.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:webauthn_live_component, path: "~/projects/webauthn_live_component"}
+      {:webauthn_live_component, "~> 0.1.0", organization: "liveshowy"}
     ]
   end
 
