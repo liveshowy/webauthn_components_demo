@@ -1,5 +1,5 @@
 {
-  "cSpell.words": [
-    "webauthn"
-  ]
+  "cSpell.words": ["webauthn"],
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true
 }
