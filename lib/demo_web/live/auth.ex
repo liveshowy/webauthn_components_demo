@@ -38,6 +38,18 @@ defmodule DemoWeb.Live.Auth do
     {:noreply, socket}
   end
 
+  def handle_info({:user_token, token: token}, socket) when is_binary(token) do
+    {
+      :noreply,
+      socket
+      |> push_event("clear_token", %{})
+    }
+  end
+
+  def handle_info({:user_token, token: nil}, socket) do
+    {:noreply, socket}
+  end
+
   def handle_info({:register_user, user: user, user_keys: user_keys}, socket) do
     # TODO: Persist the user
     # TODO: Create a session
@@ -69,11 +81,6 @@ defmodule DemoWeb.Live.Auth do
     Logger.info(find_user_by_username: {__MODULE__, username})
     user = %{username: username, id: 1234, keys: []}
     send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
-    {:noreply, socket}
-  end
-
-  def handle_info({:user_token, token: token}, socket) do
-    Logger.info(user_token: token)
     {:noreply, socket}
   end
 
