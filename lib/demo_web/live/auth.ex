@@ -26,16 +26,28 @@ defmodule DemoWeb.Live.Auth do
     """
   end
 
-  def handle_info({:register_user, username: username}, socket) do
+  def handle_info({:webauthn_supported, false}, socket) do
+    {
+      :noreply,
+      socket
+      |> put_flash(:error, "This browser does not support passwordless accounts.")
+    }
+  end
+
+  def handle_info({:webauthn_supported, _true}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info({:register_user, user: user, user_keys: user_keys}, socket) do
     # TODO: Persist the user
     # TODO: Create a session
     # TODO: Assign @current_user to socket
-    Logger.info(register_user: {__MODULE__, username})
+    Logger.info(register_user: {__MODULE__, user: user, user_keys: user_keys})
 
     {
       :noreply,
       socket
-      |> put_flash(:info, "Register #{username}")
+      |> put_flash(:info, "#{user.username} registered!")
     }
   end
 
