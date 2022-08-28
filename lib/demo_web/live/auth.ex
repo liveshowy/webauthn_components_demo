@@ -65,6 +65,11 @@ defmodule DemoWeb.Live.Auth do
     {:noreply, socket}
   end
 
+  def handle_info({:error, error}, socket) do
+    Logger.error(error: {__MODULE__, error})
+    {:noreply, socket}
+  end
+
   def handle_info(message, socket) do
     Logger.debug(unhandled_message: {__MODULE__, message})
     {:noreply, socket}
