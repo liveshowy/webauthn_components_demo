@@ -22,6 +22,7 @@ defmodule Demo.Authentication.UserToken do
     user_token
     |> cast(attrs, [:token, :context, :user_id])
     |> validate_required([:token, :context, :user_id])
+    |> foreign_key_constraint(:user_id)
   end
 
   @doc """
