@@ -17,7 +17,7 @@
             <li><%= link "Home", to: Routes.page_path(@conn, :index) %></li>
 
             <%= if assigns[:current_user] do %>
-              <li><%= link "Sign Out", to: Routes.auth_path(@conn, :deauth) %></li>
+              <li><%= link "Sign Out", to: Routes.auth_path(@conn, :auth) %></li>
             <% else %>
               <li><%= link "Sign In", to: Routes.auth_path(@conn, :auth) %></li>
             <% end %>
