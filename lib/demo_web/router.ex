@@ -1,5 +1,6 @@
 defmodule DemoWeb.Router do
   use DemoWeb, :router
+  alias DemoWeb.Hooks.User, as: UserHook
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -14,11 +15,13 @@ defmodule DemoWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", DemoWeb do
-    pipe_through :browser
+  live_session :default, on_mount: {UserHook, :default} do
+    scope "/", DemoWeb do
+      pipe_through :browser
 
-    get "/", PageController, :index
-    live "/auth", Live.Auth, :auth
+      get "/", PageController, :index
+      live "/auth", Live.Auth, :auth
+    end
   end
 
   # Other scopes may use custom stacks.
