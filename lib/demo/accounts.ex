@@ -42,10 +42,10 @@ defmodule Demo.Accounts do
 
   ## Examples
 
-      iex> get_by(:username, "owen)
-      nil
+      iex> get_user_by(:username, "owen)
+      %User{}
   """
-  def get_by(key, value) when is_atom(key) do
+  def get_user_by(key, value) when is_atom(key) do
     keyword = [] |> Keyword.put(key, value)
 
     User
