@@ -6,6 +6,7 @@ defmodule Demo.Authentication.UserKey do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+  @derive {Jason.Encoder, only: [:key_id, :public_key, :label, :last_used]}
   schema "user_keys" do
     field :key_id, :binary
     field :label, :string, default: "default"
@@ -21,8 +22,10 @@ defmodule Demo.Authentication.UserKey do
     user_key
     |> cast(attrs, [:user_id, :key_id, :public_key, :label, :last_used])
     |> validate_required([:user_id, :key_id, :public_key, :label])
-    |> unique_constraint([:key_id])
-    |> unique_constraint([:user_id, :label])
+    |> update_change(:key_id, &Base.decode64!(&1, padding: false))
+    |> foreign_key_constraint(:user_id)
+    |> unique_constraint([:key_id], message: "key already registered")
+    |> unique_constraint([:user_id, :label], message: "label already taken")
   end
 
   @doc false
@@ -30,5 +33,6 @@ defmodule Demo.Authentication.UserKey do
     user_key
     |> cast(attrs, [:label, :last_used])
     |> validate_required([:label])
+    |> unique_constraint([:user_id, :label], message: "label already taken")
   end
 end
