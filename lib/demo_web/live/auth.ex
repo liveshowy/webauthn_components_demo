@@ -4,13 +4,25 @@ defmodule DemoWeb.Live.Auth do
   """
   use DemoWeb, :live_view
   require Logger
+  alias Demo.Accounts
+  alias Demo.Authentication
 
   def mount(_params, _session, socket) do
-    {
-      :ok,
-      socket
-      |> assign(:page_title, "Authentication")
-    }
+    current_user = socket.assigns.current_user
+
+    if current_user do
+      {
+        :ok,
+        socket
+        |> push_redirect(to: Routes.page_path(socket, :index))
+      }
+    else
+      {
+        :ok,
+        socket
+        |> assign(:page_title, "Authentication")
+      }
+    end
   end
 
   def render(assigns) do
@@ -43,6 +55,8 @@ defmodule DemoWeb.Live.Auth do
       :noreply,
       socket
       |> push_event("clear_token", %{})
+      |> clear_flash()
+      |> put_flash(:info, "You have been signed out.")
     }
   end
 
@@ -50,38 +64,77 @@ defmodule DemoWeb.Live.Auth do
     {:noreply, socket}
   end
 
-  def handle_info({:register_user, user: user, user_keys: user_keys}, socket) do
-    # TODO: Persist the user
-    # TODO: Create a session
-    # TODO: Assign @current_user to socket
-    Logger.info(register_user: {__MODULE__, user: user, user_keys: user_keys})
-
-    {
-      :noreply,
-      socket
-      |> put_flash(:info, "#{user.username} registered!")
-    }
-  end
-
-  def handle_info({:authenticate_user, username: username}, socket) do
-    # TODO: Get user by username
-    # TODO: Create a session
-    # TODO: Assign @current_user to socket
-    Logger.info(authenticate_user: {__MODULE__, username})
-
-    {
-      :noreply,
-      socket
-      |> put_flash(:info, "Authenticate #{username}")
-    }
-  end
-
   def handle_info({:find_user_by_username, username: username}, socket) do
-    # TODO: perform a real user lookup
-    Logger.info(find_user_by_username: {__MODULE__, username})
-    user = %{username: username, id: 1234, keys: []}
-    send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
-    {:noreply, socket}
+    user = Accounts.get_user_by(:username, username, [:keys])
+
+    if user do
+      send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
+      {:noreply, socket}
+    else
+      {
+        :noreply,
+        socket
+        |> clear_flash()
+        |> put_flash(:error, "There is no user with this username.")
+      }
+    end
+  end
+
+  def handle_info({:register_user, user: user, key: key}, socket) do
+    with {:ok, %{user: new_user}} <- Accounts.create_user_with_key(user, key),
+         session_token <- Authentication.generate_user_session_token(new_user),
+         token_64 <- Base.url_encode64(session_token, padding: false) do
+      {
+        :noreply,
+        socket
+        |> clear_flash()
+        |> put_flash(:info, "New account for #{new_user.username} registered!")
+        |> assign(:current_user, new_user)
+        |> push_event("store_token", %{token: token_64})
+      }
+    else
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {
+          :noreply,
+          socket
+          |> put_flash(:error, "Failed to register a new account.")
+          |> send_update(WebAuthnLiveComponent, %{changeset: changeset})
+        }
+
+      other_error ->
+        Logger.warn(unhandled_error: {__MODULE__, other_error})
+
+        {
+          :noreply,
+          socket
+          |> put_flash(:error, "Failed to register a new account.")
+        }
+    end
+  end
+
+  def handle_info({:authentication_successful, key_id: key_id}, socket) do
+    user_key = Authentication.get_user_key_by_key_id(key_id, [:user])
+    %{user: user} = user_key
+    session_token = Authentication.generate_user_session_token(user)
+    token = Base.url_encode64(session_token, padding: false)
+    Authentication.update_user_key(user_key, %{last_used: DateTime.utc_now()})
+
+    {
+      :noreply,
+      socket
+      |> assign(:current_user, user)
+      |> push_event("store_token", %{token: token})
+      |> clear_flash()
+      |> put_flash(:info, "Welcome back, #{user.username}!")
+    }
+  end
+
+  def handle_info({:redirect}, socket) do
+    {
+      :noreply,
+      socket
+      |> redirect(to: Routes.page_path(socket, :index))
+    }
   end
 
   def handle_info({:error, error}, socket) do
