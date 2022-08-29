@@ -5,8 +5,10 @@ defmodule Demo.Accounts do
 
   import Ecto.Query, warn: false
   alias Demo.Repo
+  alias Ecto.Multi
 
   alias Demo.Accounts.User
+  alias Demo.Authentication.UserKey
 
   @doc """
   Returns the list of users.
@@ -68,6 +70,18 @@ defmodule Demo.Accounts do
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def create_user_with_key(user_attrs, key_attrs) do
+    Multi.new()
+    |> Multi.insert(:user, User.changeset(%User{}, user_attrs))
+    |> Multi.merge(fn %{user: user} ->
+      key_attrs = Map.put(key_attrs, :user_id, user.id)
+
+      Multi.new()
+      |> Multi.insert(:user_key, UserKey.new_changeset(%UserKey{}, key_attrs))
+    end)
+    |> Repo.transaction()
   end
 
   @doc """
