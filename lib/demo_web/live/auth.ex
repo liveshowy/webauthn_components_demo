@@ -65,14 +65,12 @@ defmodule DemoWeb.Live.Auth do
   end
 
   def handle_info({:find_user_by_username, username: username}, socket) do
-    user = Accounts.get_user_by(:username, username)
+    user = Accounts.get_user_by(:username, username, [:keys])
     send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
     {:noreply, socket}
   end
 
   def handle_info({:register_user, user: user, key: key}, socket) do
-    IO.inspect(user: user, key: key)
-
     with {:ok, %{user: new_user}} <- Accounts.create_user_with_key(user, key),
          session_token <- Authentication.generate_user_session_token(new_user),
          token_64 <- Base.url_encode64(session_token, padding: false) do
@@ -81,12 +79,11 @@ defmodule DemoWeb.Live.Auth do
         socket
         |> clear_flash()
         |> put_flash(:info, "New account for #{new_user.username} registered!")
+        |> assign(:current_user, new_user)
         |> push_event("store_token", %{token: token_64})
       }
     else
-      %Ecto.Changeset{} = changeset ->
-        IO.inspect(changeset)
-
+      {:error, %Ecto.Changeset{} = changeset} ->
         {
           :noreply,
           socket
@@ -95,7 +92,7 @@ defmodule DemoWeb.Live.Auth do
         }
 
       other_error ->
-        IO.inspect(other_error)
+        Logger.warn(unhandled_error: {__MODULE__, other_error})
 
         {
           :noreply,
@@ -105,25 +102,28 @@ defmodule DemoWeb.Live.Auth do
     end
   end
 
-  def handle_event("token_stored", %{"token" => _token}, socket) do
+  def handle_info({:authentication_successful, key_id: key_id}, socket) do
+    user_key = Authentication.get_user_key_by_key_id(key_id, [:user])
+    %{user: user} = user_key
+    session_token = Authentication.generate_user_session_token(user)
+    token = Base.url_encode64(session_token, padding: false)
+    Authentication.update_user_key(user_key, %{last_used: DateTime.utc_now()})
+
     {
       :noreply,
       socket
-      |> push_redirect(to: Routes.page_path(socket, :index))
+      |> assign(:current_user, user)
+      |> push_event("store_token", %{token: token})
+      |> clear_flash()
+      |> put_flash(:info, "Welcome back, #{user.username}!")
     }
   end
 
-  def handle_info({:authenticate_user, username: username}, socket) do
-    # TODO: Get user by username
-    # TODO: Create a session
-    # TODO: Assign @current_user to socket
-    # TODO: update UserKey.last_used
-    Logger.info(authenticate_user: {__MODULE__, username})
-
+  def handle_info({:redirect}, socket) do
     {
       :noreply,
       socket
-      |> put_flash(:info, "Authenticate #{username}")
+      |> redirect(to: Routes.page_path(socket, :index))
     }
   end
 
