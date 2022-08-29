@@ -7,6 +7,9 @@ defmodule Demo.Authentication do
   alias Demo.Repo
 
   alias Demo.Authentication.UserKey
+  alias Demo.Authentication.UserToken
+
+  # USER KEYS
 
   @doc """
   Returns the list of user_keys.
@@ -51,7 +54,7 @@ defmodule Demo.Authentication do
   """
   def create_user_key(attrs \\ %{}) do
     %UserKey{}
-    |> UserKey.changeset(attrs)
+    |> UserKey.new_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -69,7 +72,7 @@ defmodule Demo.Authentication do
   """
   def update_user_key(%UserKey{} = user_key, attrs) do
     user_key
-    |> UserKey.changeset(attrs)
+    |> UserKey.new_changeset(attrs)
     |> Repo.update()
   end
 
@@ -99,6 +102,58 @@ defmodule Demo.Authentication do
 
   """
   def change_user_key(%UserKey{} = user_key, attrs \\ %{}) do
-    UserKey.changeset(user_key, attrs)
+    UserKey.update_changeset(user_key, attrs)
+  end
+
+  # USER TOKENS
+
+  @doc """
+  Gets a single user_token.
+
+  Raises `Ecto.NoResultsError` if the User key does not exist.
+
+  ## Examples
+
+      iex> get_user_token!(123)
+      %UserKey{}
+
+      iex> get_user_token!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user_token!(id), do: Repo.get!(UserToken, id)
+
+  @doc """
+  Creates a user_token.
+
+  ## Examples
+
+      iex> create_user_token(%{field: value})
+      {:ok, %UserKey{}}
+
+      iex> create_user_token(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_user_token(attrs \\ %{}) do
+    UserToken
+    |> UserToken.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Deletes a user_token.
+
+  ## Examples
+
+      iex> delete_user_token(user_token)
+      {:ok, %UserKey{}}
+
+      iex> delete_user_token(user_token)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_user_token(%UserToken{} = user_token) do
+    Repo.delete(user_token)
   end
 end
