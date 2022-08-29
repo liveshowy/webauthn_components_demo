@@ -16,9 +16,16 @@ defmodule Demo.Authentication.UserKey do
   end
 
   @doc false
-  def changeset(user_key, attrs) do
+  def new_changeset(user_key, attrs) do
     user_key
     |> cast(attrs, [:user_id, :key_id, :public_key, :label, :last_used])
     |> validate_required([:user_id, :key_id, :public_key, :label])
+  end
+
+  @doc false
+  def update_changeset(user_key, attrs) do
+    user_key
+    |> cast(attrs, [:label, :last_used])
+    |> validate_required([:label])
   end
 end
