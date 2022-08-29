@@ -10,6 +10,11 @@ import Config
 config :demo,
   ecto_repos: [Demo.Repo]
 
+config :demo, :generators,
+  migration: true,
+  binary_id: true,
+  sample_binary_id: "11111111-1111-1111-1111-111111111111"
+
 # Configures the endpoint
 config :demo, DemoWeb.Endpoint,
   url: [host: "localhost"],
