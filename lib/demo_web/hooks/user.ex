@@ -7,6 +7,11 @@ defmodule DemoWeb.Hooks.User do
   alias Demo.Accounts.User
   alias Demo.Authentication
 
+  @doc """
+  Assign a `current_user` key to the socket.
+
+  If the socket is connected, a user lookup is attempted, using `_user_token` from `app.js`.
+  """
   def on_mount(name, params, session, socket)
 
   def on_mount(:default, _, _, %{assigns: %{current_user: %User{}}} = socket) do
@@ -18,7 +23,7 @@ defmodule DemoWeb.Hooks.User do
          socket_params <- get_connect_params(socket),
          user_token <- Map.get(socket_params, "_user_token", ""),
          {:ok, binary_token} <- Base.url_decode64(user_token, padding: false),
-         current_user <- Authentication.get_user_by_session_token(binary_token, [:keys]) do
+         current_user <- Authentication.get_user_by_session_token(binary_token) do
       {
         :cont,
         socket
