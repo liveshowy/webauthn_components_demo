@@ -47,11 +47,12 @@ defmodule Demo.Accounts do
       iex> get_user_by(:username, "owen)
       %User{}
   """
-  def get_user_by(key, value) when is_atom(key) do
+  def get_user_by(key, value, preloads \\ []) when is_atom(key) do
     keyword = [] |> Keyword.put(key, value)
 
     User
     |> Repo.get_by(keyword)
+    |> Repo.preload(preloads)
   end
 
   @doc """

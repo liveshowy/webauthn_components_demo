@@ -40,6 +40,12 @@ defmodule Demo.Authentication do
   """
   def get_user_key!(id), do: Repo.get!(UserKey, id)
 
+  def get_user_key_by_key_id(key_id, preloads \\ []) do
+    UserKey
+    |> Repo.get_by(key_id: key_id)
+    |> Repo.preload(preloads)
+  end
+
   @doc """
   Creates a user_key.
 
