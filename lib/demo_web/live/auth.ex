@@ -66,8 +66,18 @@ defmodule DemoWeb.Live.Auth do
 
   def handle_info({:find_user_by_username, username: username}, socket) do
     user = Accounts.get_user_by(:username, username, [:keys])
-    send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
-    {:noreply, socket}
+
+    if user do
+      send_update(WebAuthnLiveComponent, id: "auth_form", found_user: user)
+      {:noreply, socket}
+    else
+      {
+        :noreply,
+        socket
+        |> clear_flash()
+        |> put_flash(:error, "There is no user with this username.")
+      }
+    end
   end
 
   def handle_info({:register_user, user: user, key: key}, socket) do
