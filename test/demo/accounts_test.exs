@@ -22,7 +22,7 @@ defmodule Demo.AccountsTest do
 
     test "get_by/2 returns the user with given username" do
       user = user_fixture()
-      assert Accounts.get_by(:username, user.username) == user
+      assert Accounts.get_user_by(:username, user.username) == user
     end
 
     test "create_user/1 with valid data creates a user" do
