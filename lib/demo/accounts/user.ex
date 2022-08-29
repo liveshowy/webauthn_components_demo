@@ -19,7 +19,8 @@ defmodule Demo.Accounts.User do
     user
     |> cast(attrs, [:username])
     |> validate_required([:username])
-    |> cast_assoc(:keys)
+    |> unique_constraint([:username])
+    |> cast_assoc(:keys, with: &UserKey.new_changeset/2)
     |> cast_assoc(:tokens)
   end
 end
