@@ -1,7 +1,3 @@
-// We import the CSS which is extracted to its own file by esbuild.
-// Remove this line if you add a your own CSS build pipeline (e.g postcss).
-import "../css/app.css";
-
 // If you want to use Phoenix channels, run `mix help phx.gen.channel`
 // to get started and then uncomment the line below.
 // import "./user_socket.js"
@@ -25,23 +21,19 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
-import { WebAuthn } from "webauthn_live_component";
-
-let getUserToken = () => window.sessionStorage.getItem("user_token") || "";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
-
-let hooks = { WebAuthn };
 let liveSocket = new LiveSocket("/live", Socket, {
-  params: { _csrf_token: csrfToken, _user_token: getUserToken() },
-  hooks: hooks,
+  params: { _csrf_token: csrfToken },
 });
 
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
-window.addEventListener("phx:page-loading-start", (info) => topbar.show());
+window.addEventListener("phx:page-loading-start", (info) =>
+  topbar.delayedShow(200)
+);
 window.addEventListener("phx:page-loading-stop", (info) => topbar.hide());
 
 // connect if there are any LiveViews on the page

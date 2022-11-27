@@ -3,7 +3,8 @@ defmodule DemoWeb.Hooks.User do
   Session hook for setting a user assign
   """
   require Logger
-  import Phoenix.LiveView
+  import Phoenix.LiveView, only: [connected?: 1, get_connect_params: 1]
+  import Phoenix.Component, only: [assign: 3, assign_new: 3]
   alias Demo.Accounts.User
   alias Demo.Authentication
 
