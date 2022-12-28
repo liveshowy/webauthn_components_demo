@@ -40,9 +40,15 @@ defmodule Demo.Authentication do
   """
   def get_user_key!(id), do: Repo.get!(UserKey, id)
 
-  def get_user_key_by_key_id(key_id, preloads \\ []) do
+  def get_user_key_by_key_id(key_id, preloads \\ [:user]) do
     UserKey
     |> Repo.get_by(key_id: key_id)
+    |> Repo.preload(preloads)
+  end
+
+  def get_user_key_by_user_handle(user_handle, preloads \\ [:user]) do
+    UserKey
+    |> Repo.get_by(user_handle: user_handle)
     |> Repo.preload(preloads)
   end
 
@@ -78,7 +84,7 @@ defmodule Demo.Authentication do
   """
   def update_user_key(%UserKey{} = user_key, attrs) do
     user_key
-    |> UserKey.new_changeset(attrs)
+    |> UserKey.update_changeset(attrs)
     |> Repo.update()
   end
 
@@ -169,18 +175,17 @@ defmodule Demo.Authentication do
   Generates a session token.
   """
   def generate_user_session_token(%User{} = user) do
-    {token, user_token} = UserToken.build_session_token(user)
-    Repo.insert!(user_token)
-    token
+    user
+    |> UserToken.build_session_token()
+    |> Repo.insert()
   end
 
   @doc """
   Gets the user with the given signed token.
   """
   def get_user_by_session_token(token, preloads \\ []) do
-    {:ok, query} = UserToken.verify_session_token_query(token)
-
-    query
+    token
+    |> UserToken.verify_session_token_query()
     |> Repo.one()
     |> Repo.preload(preloads)
   end

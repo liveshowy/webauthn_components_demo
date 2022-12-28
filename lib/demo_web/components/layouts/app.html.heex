@@ -1,5 +1,5 @@
-<header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between border-b border-zinc-100 py-3">
+<header class="px-4 transition shadow-md sm:px-6 lg:px-8">
+  <div class="flex items-center justify-between py-3 text-[0.8125rem] font-semibold leading-6 text-zinc-900">
     <div class="flex items-center gap-4">
       <a href="/">
         <svg viewBox="0 0 71 48" class="h-6" aria-hidden="true">
@@ -14,29 +14,19 @@
       </p>
     </div>
     <div class="flex items-center gap-4">
-      <a
-        href="https://twitter.com/elixirphoenix"
-        class="text-[0.8125rem] font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
-      >
-        @elixirphoenix
-      </a>
-      <a
-        href="https://github.com/phoenixframework/phoenix"
-        class="text-[0.8125rem] font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
-      >
-        GitHub
-      </a>
-      <a
-        href="https://hexdocs.pm/phoenix/overview.html"
-        class="rounded-lg bg-zinc-100 px-2 py-1 text-[0.8125rem] font-semibold leading-6 text-zinc-900 hover:bg-zinc-200/80 active:text-zinc-900/70"
-      >
-        Get Started <span aria-hidden="true">&rarr;</span>
-      </a>
+      <.link :if={!@current_user} href="/passkey">Sign In</.link>
+      <.link :if={@current_user} href="/user/profile" title="Edit your profile" class="w-6 h-6 fill-current">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full">
+          <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
+        </svg>
+      </.link>
+      <.link :if={@current_user} href="/sign-out">Sign Out</.link>
     </div>
   </div>
 </header>
+
 <main class="px-4 py-20 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
+  <div class="max-w-2xl mx-auto">
     <.flash kind={:info} title="Success!" flash={@flash} />
     <.flash kind={:error} title="Error!" flash={@flash} />
     <.flash
@@ -48,7 +38,7 @@
       phx-disconnected={show("#disconnected")}
       phx-connected={hide("#disconnected")}
     >
-      Attempting to reconnect <Heroicons.arrow_path class="ml-1 w-3 h-3 inline animate-spin" />
+      Attempting to reconnect <Heroicons.arrow_path class="inline w-3 h-3 ml-1 animate-spin" />
     </.flash>
     <%= @inner_content %>
   </div>
