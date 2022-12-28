@@ -20,6 +20,24 @@ defmodule DemoWeb.Router do
     get "/", PageController, :home
   end
 
+  live_session :default, on_mount: {DemoWeb.Hooks.User, :assign_user} do
+    scope "/", DemoWeb do
+      pipe_through :browser
+
+      live "/passkey", Live.Passkey
+      live "/sign-out", Live.Passkey, :sign_out
+    end
+  end
+
+  live_session :authenticated,
+    on_mount: [{DemoWeb.Hooks.User, :assign_user}, {DemoWeb.Hooks.User, :require_user}] do
+    scope "/user", DemoWeb do
+      pipe_through :browser
+
+      live "/profile", Live.UserProfile
+    end
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", DemoWeb do
   #   pipe_through :api
