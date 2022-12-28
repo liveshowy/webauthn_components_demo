@@ -63,17 +63,15 @@ defmodule DemoWeb.Live.Passkey do
     end
   end
 
-  # TODO: verify token
-  def handle_info({:user_token, _token}, socket) do
-    {:noreply, socket}
-  end
-
   def handle_info({:registration_successful, params}, socket) do
     multi = build_new_user_multi(params)
 
     case Repo.transaction(multi) do
       {:ok, %{user: user, key: _key, token: token}} ->
-        send_update(PasskeyComponent, id: "passkey-component", token: token)
+        send_update(PasskeyComponent,
+          id: "passkey-component",
+          token: Base.encode64(token.token, padding: false)
+        )
 
         {
           :noreply,
@@ -168,10 +166,10 @@ defmodule DemoWeb.Live.Passkey do
 
   def handle_info({:token_stored, token: token}, socket) do
     decoded_token = Base.decode64!(token, padding: false)
-    user = Authentication.get_user_by_session_token(decoded_token, [:profile])
+    user = Authentication.get_user_by_session_token(decoded_token)
 
     case user do
-      %User{profile: profile} ->
+      %User{} ->
         {
           :noreply,
           socket
