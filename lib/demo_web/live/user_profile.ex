@@ -1,4 +1,7 @@
 defmodule DemoWeb.Live.UserProfile do
+  @moduledoc """
+  LiveView for creating or updating a user's profile.
+  """
   use DemoWeb, :live_view
   require Logger
   alias Demo.Accounts

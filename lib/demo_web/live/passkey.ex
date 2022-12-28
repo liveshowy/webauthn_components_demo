@@ -1,4 +1,9 @@
 defmodule DemoWeb.Live.Passkey do
+  @moduledoc """
+  Example LiveView implementation of `WebAuthnLiveComponent.PasskeyComponent`.
+
+  Documentation may be found on [HexDocs](https://hexdocs.pm/webauthn_live_component/WebAuthnLiveComponent.PasskeyComponent.html). See the [source code](https://github.com/liveshowy/webauthn_live_component_demo/blob/main/lib/demo_web/live/passkey.ex) for complete implementation details.
+  """
   use DemoWeb, :live_view
   require Logger
   alias Demo.Authentication
