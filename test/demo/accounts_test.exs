@@ -1,15 +1,11 @@
 defmodule Demo.AccountsTest do
-  use Demo.DataCase
+  use Demo.DataCase, async: true
+  import Demo.AccountsFixtures
 
   alias Demo.Accounts
+  alias Demo.Accounts.User
 
   describe "users" do
-    alias Demo.Accounts.User
-
-    import Demo.AccountsFixtures
-
-    @invalid_attrs %{username: nil}
-
     test "list_users/0 returns all users" do
       user = user_fixture()
       assert Accounts.list_users() == [user]
@@ -18,36 +14,6 @@ defmodule Demo.AccountsTest do
     test "get_user!/1 returns the user with given id" do
       user = user_fixture()
       assert Accounts.get_user!(user.id) == user
-    end
-
-    test "get_by/2 returns the user with given username" do
-      user = user_fixture()
-      assert Accounts.get_user_by(:username, user.username) == user
-    end
-
-    test "create_user/1 with valid data creates a user" do
-      valid_attrs = %{username: "some username"}
-
-      assert {:ok, %User{} = user} = Accounts.create_user(valid_attrs)
-      assert user.username == "some username"
-    end
-
-    test "create_user/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_user(@invalid_attrs)
-    end
-
-    test "update_user/2 with valid data updates the user" do
-      user = user_fixture()
-      update_attrs = %{username: "some updated username"}
-
-      assert {:ok, %User{} = user} = Accounts.update_user(user, update_attrs)
-      assert user.username == "some updated username"
-    end
-
-    test "update_user/2 with invalid data returns error changeset" do
-      user = user_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, @invalid_attrs)
-      assert user == Accounts.get_user!(user.id)
     end
 
     test "delete_user/1 deletes the user" do

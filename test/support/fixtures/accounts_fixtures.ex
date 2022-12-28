@@ -8,12 +8,7 @@ defmodule Demo.AccountsFixtures do
   Generate a user.
   """
   def user_fixture(attrs \\ %{}) do
-    {:ok, user} =
-      attrs
-      |> Enum.into(%{
-        username: "some username"
-      })
-      |> Demo.Accounts.create_user()
+    {:ok, user} = Demo.Accounts.create_user(attrs)
 
     user
   end

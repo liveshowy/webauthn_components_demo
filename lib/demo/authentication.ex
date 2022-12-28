@@ -84,7 +84,7 @@ defmodule Demo.Authentication do
   """
   def update_user_key(%UserKey{} = user_key, attrs) do
     user_key
-    |> UserKey.new_changeset(attrs)
+    |> UserKey.update_changeset(attrs)
     |> Repo.update()
   end
 
