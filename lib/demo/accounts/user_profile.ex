@@ -19,13 +19,15 @@ defmodule Demo.Accounts.UserProfile do
   def changeset(user_profile, attrs) do
     user_profile
     |> cast(attrs, [:user_id, :username, :email, :first_name, :last_name])
-    |> foreign_key_constraint(:user_id)
     |> validate_required([:user_id, :username, :email])
-    |> validate_length(:username, min: 2, max: 80)
-    |> validate_length(:email, min: 6, max: 120)
-    |> validate_format(:email, ~r/@/)
-    |> unique_constraint(:email)
-    |> unique_constraint(:username)
+    |> foreign_key_constraint(:user_id)
     |> unique_constraint(:user_id)
+    |> validate_length(:username, min: 2, max: 80)
+    |> update_change(:username, &String.downcase/1)
+    |> unique_constraint(:username)
+    |> validate_format(:email, ~r/@/)
+    |> validate_length(:email, min: 6, max: 120)
+    |> update_change(:email, &String.downcase/1)
+    |> unique_constraint(:email)
   end
 end
