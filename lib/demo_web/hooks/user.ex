@@ -1,6 +1,6 @@
 defmodule DemoWeb.Hooks.User do
   @moduledoc """
-  Session hook for setting a user assign
+  Session hooks for setting a user assign and requiring a valid user.
   """
   require Logger
   import Phoenix.LiveView
@@ -16,14 +16,13 @@ defmodule DemoWeb.Hooks.User do
   def on_mount(name, params, session, socket)
 
   def on_mount(:assign_user, _, _, %{assigns: %{current_user: %User{}}} = socket) do
-    {
-      :halt,
-      socket
-      |> push_navigate(to: "/user/profile", replace: true)
-    }
+    {:cont, socket}
   end
 
   def on_mount(:assign_user, _, _, socket) do
+    # Ensure `@current_user` assign exists.
+    socket = assign_new(socket, :current_user, fn -> nil end)
+
     with {:connected, true} <- {:connected, connected?(socket)},
          {:socket_params, socket_params} <- {:socket_params, get_connect_params(socket)},
          {:user_token, user_token} when is_binary(user_token) <-
@@ -37,29 +36,14 @@ defmodule DemoWeb.Hooks.User do
       }
     else
       {:connected, false} ->
-        {
-          :cont,
-          socket
-          |> assign_new(:current_user, fn -> nil end)
-        }
+        {:cont, socket}
 
       {:user_token, invalid_token} ->
-        Logger.warn(invalid_user_token: invalid_token)
-
-        {
-          :cont,
-          socket
-          |> assign_new(:current_user, fn -> nil end)
-        }
+        {:cont, socket}
 
       other_result ->
         Logger.warn(unhandled_result: {__MODULE__, other_result})
-
-        {
-          :cont,
-          socket
-          |> assign_new(:current_user, fn -> nil end)
-        }
+        {:cont, socket}
     end
   end
 
