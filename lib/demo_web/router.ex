@@ -25,7 +25,7 @@ defmodule DemoWeb.Router do
       pipe_through :browser
 
       live "/passkey", Live.Passkey
-      live "/sign-out", Live.Passkey, :sign_out
+      live "/sign-out", Live.SignOut, :sign_out
     end
   end
 
