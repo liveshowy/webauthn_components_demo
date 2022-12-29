@@ -50,11 +50,6 @@ defmodule DemoWeb.Live.Passkey do
     """
   end
 
-  def handle_event(event, payload, socket) do
-    Logger.warn(unhandled_event: event, payload: payload)
-    {:noreply, socket}
-  end
-
   def handle_info({:passkeys_supported, boolean}, socket) do
     if boolean == true do
       # No need to alert the user here.
@@ -82,7 +77,6 @@ defmodule DemoWeb.Live.Passkey do
           :noreply,
           socket
           |> assign(:current_user, user)
-          |> put_flash(:info, "Successfully created a new account.")
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -127,7 +121,6 @@ defmodule DemoWeb.Live.Passkey do
           :noreply,
           socket
           |> assign(:current_user, user)
-          |> put_flash(:info, "Successfully signed in.")
         }
 
       _ ->
@@ -159,7 +152,6 @@ defmodule DemoWeb.Live.Passkey do
           :noreply,
           socket
           |> assign(:current_user, user)
-          |> put_flash(:info, "Already signed in.")
           |> push_navigate(to: @user_profile_path)
         }
 
