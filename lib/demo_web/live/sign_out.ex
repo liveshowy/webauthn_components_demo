@@ -1,34 +1,31 @@
 defmodule DemoWeb.Live.SignOut do
   @moduledoc """
   LiveView for handling sign out.
+
+  Uses `PasskeyHook` to send and receive token events.
   """
   use DemoWeb, :live_view
-  alias WebAuthnLiveComponent.PasskeyComponent
 
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {
+      :ok,
+      socket
+      |> push_event("clear-token", %{})
+    }
   end
 
   def render(assigns) do
-    send_update_after(PasskeyComponent, [id: "passkey-component", token: :clear], 3_000)
-
     ~H"""
-    <div class="contents">
-      <section class="flex items-center justify-center w-full h-full">
-        <h1 class="text-3xl animate-pulse">Signing Out</h1>
-
-      </section>
-
-      <div class="opacity-0">
-        <.live_component module={PasskeyComponent} app={:demo_app} id="passkey-component" />
-      </div>
-    </div>
+    <section id="sign-out-section" phx-hook="PasskeyHook" class="flex items-center justify-center w-full h-full">
+      <h1 class="text-3xl">Signing Out</h1>
+    </section>
     """
   end
 
-  def handle_info({:token_cleared}, socket) do
-    IO.inspect(token_cleared: __MODULE__)
-
+  @doc """
+  Handles `"token-cleared"` event from the `PasskeyHook` and ignores all other events.
+  """
+  def handle_event("token-cleared", _payload, socket) do
     {
       :noreply,
       socket
@@ -37,7 +34,7 @@ defmodule DemoWeb.Live.SignOut do
     }
   end
 
-  def handle_info(_message, socket) do
+  def handle_event(_event, _payload, socket) do
     {:noreply, socket}
   end
 end
