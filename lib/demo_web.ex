@@ -53,7 +53,8 @@ defmodule DemoWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {DemoWeb.Layouts, :app}
+        layout: {DemoWeb.Layouts, :app},
+        container: {:div, class: "contents"}
 
       unquote(html_helpers())
     end
