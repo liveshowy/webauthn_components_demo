@@ -44,6 +44,7 @@ defmodule DemoWeb.Live.UserProfile do
         field={{profile, :username}}
         type="text"
         label="Username"
+        autofocus
       />
 
       <.input
