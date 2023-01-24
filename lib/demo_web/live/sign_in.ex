@@ -1,4 +1,4 @@
-defmodule DemoWeb.Live.Passkey do
+defmodule DemoWeb.Live.SignIn do
   @moduledoc """
   Example LiveView implementation of `WebauthnComponents`.
 

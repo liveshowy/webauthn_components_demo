@@ -24,7 +24,7 @@ defmodule DemoWeb.Router do
     scope "/", DemoWeb do
       pipe_through :browser
 
-      live "/passkey", Live.Passkey
+      live "/sign-in", Live.SignIn
       live "/sign-out", Live.SignOut, :sign_out
     end
   end
