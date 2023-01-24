@@ -70,6 +70,38 @@ defmodule DemoWeb.Live.UserProfile do
         <.button type="submit">Save</.button>
       </div>
 
+      <h2 class="text-3xl col-span-full">Passkeys</h2>
+
+      <table class="font-mono text-left">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Last Used</th>
+            <th>Created</th>
+            <th>Updated</th>
+            <th class="select-none">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr :for={key <- @current_user.keys}>
+            <td><%= key.label %></td>
+            <td><%= NaiveDateTime.to_date(key.last_used) %></td>
+            <td><%= NaiveDateTime.to_date(key.inserted_at) %></td>
+            <td><%= NaiveDateTime.to_date(key.updated_at) %></td>
+            <td class="select-none">
+              <.button
+                phx-click="delete-key"
+                value={key.id}
+                disabled={length(@current_user.keys) == 1}
+                title={}
+              >
+                Delete
+              </.button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
       <%!-- TODO: Implement secondary key support --%>
       <%!--
       <hr class="opacity-50 col-span-full" />
