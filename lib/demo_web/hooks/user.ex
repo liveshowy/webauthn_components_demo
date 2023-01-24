@@ -60,7 +60,7 @@ defmodule DemoWeb.Hooks.User do
           :halt,
           socket
           |> assign_new(:current_user, fn -> nil end)
-          |> push_navigate(to: "/passkey", replace: true)
+          |> push_navigate(to: "/sign-in", replace: true)
         }
 
       true ->

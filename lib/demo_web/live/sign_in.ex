@@ -2,7 +2,7 @@ defmodule DemoWeb.Live.SignIn do
   @moduledoc """
   Example LiveView implementation of `WebauthnComponents`.
 
-  Documentation may be found on [HexDocs](https://hexdocs.pm/webauthn_live_component/WebauthnComponents.html). See the [source code](https://github.com/liveshowy/webauthn_live_component_demo/blob/main/lib/demo_web/live/passkey.ex) for complete implementation details.
+  Documentation may be found on [HexDocs](https://hexdocs.pm/webauthn_live_component/WebauthnComponents.html). See the [source code](https://github.com/liveshowy/webauthn_live_component_demo/blob/main/lib/demo_web/live/sign_in.ex) for complete implementation details.
   """
   use DemoWeb, :live_view
   require Logger
@@ -24,7 +24,7 @@ defmodule DemoWeb.Live.SignIn do
 
     cond do
       action == :sign_out ->
-        send_update(TokenComponent, id: "passkey-component", token: :clear)
+        send_update(TokenComponent, id: "token-component", token: :clear)
         {:ok, socket}
 
       connected?(socket) and is_struct(current_user, User) ->
