@@ -36,7 +36,7 @@ defmodule DemoWeb.Live.UserProfile do
     let={profile}
     for={@changeset}
     phx-submit="submit"
-    class="grid items-baseline grid-cols-1 gap-2"
+    class="grid items-baseline grid-cols-1 gap-2 md:grid-cols-2"
     >
       <h1 class="text-4xl col-span-full">User Profile</h1>
 
@@ -69,6 +69,38 @@ defmodule DemoWeb.Live.UserProfile do
       <div class="flex justify-end gap-2 col-span-full">
         <.button type="submit">Save</.button>
       </div>
+
+      <h2 class="text-3xl col-span-full">Passkeys</h2>
+
+      <table class="font-mono text-left col-span-full">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Last Used</th>
+            <th>Created</th>
+            <th>Updated</th>
+            <th class="select-none">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr :for={key <- @current_user.keys}>
+            <td><%= key.label %></td>
+            <td><%= NaiveDateTime.to_date(key.last_used) %></td>
+            <td><%= NaiveDateTime.to_date(key.inserted_at) %></td>
+            <td><%= NaiveDateTime.to_date(key.updated_at) %></td>
+            <td class="flex justify-end gap-1 text-right">
+              <.button
+                phx-click="delete-key"
+                value={key.id}
+                disabled={length(@current_user.keys) == 1}
+                title={}
+              >
+                Delete
+              </.button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <%!-- TODO: Implement secondary key support --%>
       <%!--

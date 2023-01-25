@@ -1,8 +1,8 @@
-defmodule DemoWeb.Live.Passkey do
+defmodule DemoWeb.Live.SignIn do
   @moduledoc """
-  Example LiveView implementation of `WebAuthnLiveComponent.PasskeyComponent`.
+  Example LiveView implementation of `WebauthnComponents`.
 
-  Documentation may be found on [HexDocs](https://hexdocs.pm/webauthn_live_component/WebAuthnLiveComponent.PasskeyComponent.html). See the [source code](https://github.com/liveshowy/webauthn_live_component_demo/blob/main/lib/demo_web/live/passkey.ex) for complete implementation details.
+  Documentation may be found on [HexDocs](https://hexdocs.pm/webauthn_live_component/WebauthnComponents.html). See the [source code](https://github.com/liveshowy/webauthn_live_component_demo/blob/main/lib/demo_web/live/sign_in.ex) for complete implementation details.
   """
   use DemoWeb, :live_view
   require Logger
@@ -11,7 +11,10 @@ defmodule DemoWeb.Live.Passkey do
   alias Demo.Authentication.UserKey
   alias Demo.Authentication.UserToken
   alias Demo.Repo
-  alias WebAuthnLiveComponent.PasskeyComponent
+  alias WebauthnComponents.SupportComponent
+  alias WebauthnComponents.TokenComponent
+  alias WebauthnComponents.RegistrationComponent
+  alias WebauthnComponents.AuthenticationComponent
 
   @user_profile_path "/user/profile"
 
@@ -21,7 +24,7 @@ defmodule DemoWeb.Live.Passkey do
 
     cond do
       action == :sign_out ->
-        send_update(PasskeyComponent, id: "passkey-component", token: :clear)
+        send_update(TokenComponent, id: "token-component", token: :clear)
         {:ok, socket}
 
       connected?(socket) and is_struct(current_user, User) ->
@@ -45,7 +48,12 @@ defmodule DemoWeb.Live.Passkey do
         You may sign into <strong>Demo</strong> using a Passkey, which is more secure than a password.
       </p>
 
-      <.live_component module={PasskeyComponent} app={:demo_app} id="passkey-component" />
+      <section class="flex gap-2">
+        <.live_component module={SupportComponent} id="support-component" />
+        <.live_component module={TokenComponent} id="token-component" />
+        <.live_component module={RegistrationComponent} app={:demo} id="registration-component" />
+        <.live_component module={AuthenticationComponent} id="authentication-component" />
+      </section>
     </section>
     """
   end
@@ -68,8 +76,8 @@ defmodule DemoWeb.Live.Passkey do
 
     case Repo.transaction(multi) do
       {:ok, %{user: user, key: _key, token: token}} ->
-        send_update(PasskeyComponent,
-          id: "passkey-component",
+        send_update(TokenComponent,
+          id: "token-component",
           token: Base.encode64(token.token, padding: false)
         )
 
@@ -115,7 +123,7 @@ defmodule DemoWeb.Live.Passkey do
         Logger.info(authentication_success: {:user_handle, user_handle})
         {:ok, token} = Authentication.generate_user_session_token(user)
         token64 = Base.encode64(token.token, padding: false)
-        send_update(PasskeyComponent, id: "passkey-component", token: token64)
+        send_update(TokenComponent, id: "token-component", token: token64)
 
         {
           :noreply,
@@ -156,7 +164,7 @@ defmodule DemoWeb.Live.Passkey do
         }
 
       _ ->
-        send_update(PasskeyComponent, id: "passkey-component", token: :clear)
+        send_update(TokenComponent, id: "token-component", token: :clear)
         {:noreply, socket}
     end
   end
@@ -175,7 +183,7 @@ defmodule DemoWeb.Live.Passkey do
         }
 
       _ ->
-        send_update(PasskeyComponent, id: "passkey-component", token: :clear)
+        send_update(TokenComponent, id: "token-component", token: :clear)
         {:noreply, socket}
     end
   end

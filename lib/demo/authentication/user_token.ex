@@ -18,7 +18,7 @@ defmodule Demo.Authentication.UserToken do
   end
 
   @doc false
-  def changeset(user_token, attrs) do
+  def changeset(%__MODULE__{} = user_token, attrs) do
     user_token
     |> cast(attrs, [:token, :context, :user_id])
     |> validate_required([:token, :context, :user_id])

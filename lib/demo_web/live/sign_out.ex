@@ -2,7 +2,7 @@ defmodule DemoWeb.Live.SignOut do
   @moduledoc """
   LiveView for handling sign out.
 
-  Uses `PasskeyHook` to send and receive token events.
+  Uses `TokenHook` to send and receive token events.
   """
   use DemoWeb, :live_view
 
@@ -16,7 +16,7 @@ defmodule DemoWeb.Live.SignOut do
 
   def render(assigns) do
     ~H"""
-    <section id="sign-out-section" phx-hook="PasskeyHook" class="flex items-center justify-center w-full h-full">
+    <section id="sign-out-section" phx-hook="TokenHook" class="flex items-center justify-center w-full h-full">
       <h1 class="text-3xl">Signing Out</h1>
     </section>
     """

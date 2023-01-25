@@ -21,7 +21,12 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
-import { PasskeyHook } from "webauthn_live_component";
+import {
+  SupportHook,
+  TokenHook,
+  RegistrationHook,
+  AuthenticationHook,
+} from "../../../webauthn_components";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -31,7 +36,7 @@ const token = window.sessionStorage.getItem("userToken");
 
 let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken, _user_token: token },
-  hooks: { PasskeyHook },
+  hooks: { SupportHook, TokenHook, RegistrationHook, AuthenticationHook },
 });
 
 // Show progress bar on live navigation and form submits
