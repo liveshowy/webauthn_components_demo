@@ -88,7 +88,7 @@ defmodule DemoWeb.Live.UserProfile do
             <td><%= NaiveDateTime.to_date(key.last_used) %></td>
             <td><%= NaiveDateTime.to_date(key.inserted_at) %></td>
             <td><%= NaiveDateTime.to_date(key.updated_at) %></td>
-            <td class="select-none">
+            <td class="flex justify-end gap-1 text-right">
               <.button
                 phx-click="delete-key"
                 value={key.id}
