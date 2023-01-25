@@ -148,7 +148,7 @@ defmodule Demo.Authentication do
 
   """
   def create_user_token(attrs \\ %{}) do
-    UserToken
+    %UserToken{}
     |> UserToken.changeset(attrs)
     |> Repo.insert()
   end
