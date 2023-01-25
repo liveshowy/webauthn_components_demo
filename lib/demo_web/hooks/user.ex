@@ -38,8 +38,12 @@ defmodule DemoWeb.Hooks.User do
       {:connected, false} ->
         {:cont, socket}
 
-      {:user_token, invalid_token} ->
-        {:cont, socket}
+      {:user_token, _invalid_token} ->
+        {
+          :halt,
+          socket
+          |> push_navigate(to: "/sign-out", replace: true)
+        }
 
       other_result ->
         Logger.warn(unhandled_result: {__MODULE__, other_result})
