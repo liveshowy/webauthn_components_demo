@@ -36,7 +36,7 @@ defmodule DemoWeb.Live.UserProfile do
     let={profile}
     for={@changeset}
     phx-submit="submit"
-    class="grid items-baseline grid-cols-1 gap-2"
+    class="grid items-baseline grid-cols-1 gap-2 md:grid-cols-2"
     >
       <h1 class="text-4xl col-span-full">User Profile</h1>
 
@@ -72,7 +72,7 @@ defmodule DemoWeb.Live.UserProfile do
 
       <h2 class="text-3xl col-span-full">Passkeys</h2>
 
-      <table class="font-mono text-left">
+      <table class="font-mono text-left col-span-full">
         <thead>
           <tr>
             <th>Label</th>
