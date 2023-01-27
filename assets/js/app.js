@@ -26,7 +26,7 @@ import {
   TokenHook,
   RegistrationHook,
   AuthenticationHook,
-} from "../../../webauthn_components";
+} from "webauthn_components";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
