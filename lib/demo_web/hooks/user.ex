@@ -40,9 +40,8 @@ defmodule DemoWeb.Hooks.User do
 
       {:user_token, _invalid_token} ->
         {
-          :halt,
+          :cont,
           socket
-          |> push_navigate(to: "/sign-out", replace: true)
         }
 
       other_result ->
