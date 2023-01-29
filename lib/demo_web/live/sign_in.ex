@@ -51,8 +51,19 @@ defmodule DemoWeb.Live.SignIn do
       <section class="flex gap-2">
         <.live_component module={SupportComponent} id="support-component" />
         <.live_component module={TokenComponent} id="token-component" />
-        <.live_component module={RegistrationComponent} app={:demo} id="registration-component" />
-        <.live_component module={AuthenticationComponent} id="authentication-component" />
+
+        <.live_component
+          module={RegistrationComponent}
+          app={:demo}
+          id="registration-component"
+          class="px-2 py-1 border border-gray-300 hover:border-transparent bg-gray-200 hover:bg-blue-200 focus:bg-blue-300 text-gray-900 transition rounded text-base shadow-sm flex gap-2 items-center hover:-translate-y-px hover:shadow-md"
+          />
+
+        <.live_component
+          module={AuthenticationComponent}
+          id="authentication-component"
+          class="px-2 py-1 border border-gray-300 hover:border-transparent bg-gray-200 hover:bg-blue-200 focus:bg-blue-300 text-gray-900 transition rounded text-base shadow-sm flex gap-2 items-center hover:-translate-y-px hover:shadow-md"
+          />
       </section>
     </section>
     """
