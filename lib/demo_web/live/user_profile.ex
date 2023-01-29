@@ -33,7 +33,7 @@ defmodule DemoWeb.Live.UserProfile do
     ~H"""
     <.form
     :if={@changeset}
-    let={profile}
+    :let={profile}
     for={@changeset}
     phx-submit="submit"
     class="grid items-baseline grid-cols-1 gap-2 md:grid-cols-2"
