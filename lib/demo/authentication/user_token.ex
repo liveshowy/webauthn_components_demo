@@ -10,7 +10,7 @@ defmodule Demo.Authentication.UserToken do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "user_tokens" do
-    field :context, Ecto.Enum, values: [:session, :device_code], default: :session
+    field :context, Ecto.Enum, values: [:session], default: :session
     field :token, :binary
     belongs_to :user, User
 
