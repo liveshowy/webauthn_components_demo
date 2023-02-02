@@ -19,24 +19,7 @@ defmodule DemoWeb.Live.SignIn do
   @user_profile_path "/user/profile"
 
   def mount(_params, _session, socket) do
-    current_user = socket.assigns[:current_user]
-    action = socket.assigns[:live_action]
-
-    cond do
-      action == :sign_out ->
-        send_update(TokenComponent, id: "token-component", token: :clear)
-        {:ok, socket}
-
-      connected?(socket) and is_struct(current_user, User) ->
-        {
-          :ok,
-          socket
-          |> push_navigate(to: @user_profile_path)
-        }
-
-      true ->
-        {:ok, socket}
-    end
+    {:ok, socket}
   end
 
   def render(assigns) do
@@ -197,6 +180,16 @@ defmodule DemoWeb.Live.SignIn do
         send_update(TokenComponent, id: "token-component", token: :clear)
         {:noreply, socket}
     end
+  end
+
+  def handle_info({:invalid_token_returned, tokens}, socket) do
+    Logger.warn(invalid_token_returned: tokens)
+
+    {
+      :noreply,
+      socket
+      |> put_flash(:error, "Failed to store token.")
+    }
   end
 
   def handle_info({:token_cleared}, socket) do
