@@ -115,7 +115,6 @@ defmodule DemoWeb.Live.SignIn do
     case user_key do
       %UserKey{} ->
         send_update(AuthenticationComponent, id: "authentication-component", user_key: user_key)
-
         {:noreply, socket}
 
       _ ->
