@@ -52,7 +52,7 @@ defmodule DemoWeb.Hooks.User do
 
   def on_mount(:require_user, _, _, socket) do
     socket_connected? = connected?(socket)
-    current_user = socket.assigns[:current_user]
+    current_user = Map.get(socket.assigns, :current_user)
 
     cond do
       socket_connected? and is_struct(current_user, User) ->
