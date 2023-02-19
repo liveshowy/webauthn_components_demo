@@ -6,37 +6,20 @@ defmodule DemoWeb.Live.SignIn do
   """
   use DemoWeb, :live_view
   require Logger
-  alias Demo.Authentication
   alias Demo.Accounts.User
+  alias Demo.Authentication
   alias Demo.Authentication.UserKey
   alias Demo.Authentication.UserToken
   alias Demo.Repo
+  alias WebauthnComponents.AuthenticationComponent
+  alias WebauthnComponents.RegistrationComponent
   alias WebauthnComponents.SupportComponent
   alias WebauthnComponents.TokenComponent
-  alias WebauthnComponents.RegistrationComponent
-  alias WebauthnComponents.AuthenticationComponent
 
   @user_profile_path "/user/profile"
 
   def mount(_params, _session, socket) do
-    current_user = socket.assigns[:current_user]
-    action = socket.assigns[:live_action]
-
-    cond do
-      action == :sign_out ->
-        send_update(TokenComponent, id: "token-component", token: :clear)
-        {:ok, socket}
-
-      connected?(socket) and is_struct(current_user, User) ->
-        {
-          :ok,
-          socket
-          |> push_navigate(to: @user_profile_path)
-        }
-
-      true ->
-        {:ok, socket}
-    end
+    {:ok, socket}
   end
 
   def render(assigns) do
@@ -127,20 +110,12 @@ defmodule DemoWeb.Live.SignIn do
   end
 
   def handle_info({:find_credentials, user_handle: user_handle}, socket) do
-    %{user: user} = Authentication.get_user_key_by_user_handle(user_handle, [:user])
+    user_key = Authentication.get_user_key_by_user_handle(user_handle, [:user])
 
-    case user do
-      %User{} ->
-        Logger.info(authentication_success: {:user_handle, user_handle})
-        {:ok, token} = Authentication.generate_user_session_token(user)
-        token64 = Base.encode64(token.token, padding: false)
-        send_update(TokenComponent, id: "token-component", token: token64)
-
-        {
-          :noreply,
-          socket
-          |> assign(:current_user, user)
-        }
+    case user_key do
+      %UserKey{} ->
+        send_update(AuthenticationComponent, id: "authentication-component", user_key: user_key)
+        {:noreply, socket}
 
       _ ->
         Logger.error(authentication_failure: {:user_handle, user_handle})
@@ -151,6 +126,18 @@ defmodule DemoWeb.Live.SignIn do
           |> put_flash(:error, "Failed to sign in.")
         }
     end
+  end
+
+  def handle_info({:authentication_successful, user: %User{} = user}, socket) do
+    {:ok, token} = Authentication.generate_user_session_token(user)
+    token64 = Base.encode64(token.token, padding: false)
+    send_update(TokenComponent, id: "token-component", token: token64)
+
+    {
+      :noreply,
+      socket
+      |> assign(:current_user, user)
+    }
   end
 
   def handle_info({:authentication_failure, message: message}, socket) do
@@ -197,6 +184,16 @@ defmodule DemoWeb.Live.SignIn do
         send_update(TokenComponent, id: "token-component", token: :clear)
         {:noreply, socket}
     end
+  end
+
+  def handle_info({:invalid_token_returned, tokens}, socket) do
+    Logger.warn(invalid_token_returned: tokens)
+
+    {
+      :noreply,
+      socket
+      |> put_flash(:error, "Failed to store token.")
+    }
   end
 
   def handle_info({:token_cleared}, socket) do
