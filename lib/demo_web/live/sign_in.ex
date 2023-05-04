@@ -5,7 +5,6 @@ defmodule DemoWeb.Live.SignIn do
   Documentation may be found on [HexDocs](https://hexdocs.pm/webauthn_live_component/WebauthnComponents.html). See the [source code](https://github.com/liveshowy/webauthn_live_component_demo/blob/main/lib/demo_web/live/sign_in.ex) for complete implementation details.
   """
   use DemoWeb, :live_view
-  import Ecto.Changeset
   require Logger
   alias Demo.Accounts.User
   alias Demo.Authentication
@@ -20,42 +19,37 @@ defmodule DemoWeb.Live.SignIn do
   @user_profile_path "/user/profile"
 
   def mount(_params, _session, socket) do
-    changeset = build_changeset(%{"username" => nil})
+    user = %User{}
+    changeset = User.changeset(user, %{"email" => nil})
     form = to_form(changeset, as: "user")
 
     {
       :ok,
       socket
       |> assign(:form, form)
+      |> assign(:user, user)
     }
   end
 
-  defp build_changeset(params, action \\ nil) do
-    data = %{}
-    types = %{username: :string}
-    fields = Map.keys(types)
+  def handle_event("validate-email", %{"user" => params}, socket) do
+    %{user: user} = socket.assigns
 
     changeset =
-      {data, types}
-      |> cast(params, fields)
-      |> validate_required(fields)
-      |> validate_length(:username, min: 3, max: 80)
+      user
+      |> User.changeset(params)
+      |> Map.put(:action, :insert)
 
-    if action do
-      apply_action(changeset, action)
-    else
-      changeset
-    end
-  end
-
-  def handle_event("validate-username", params, socket) do
-    changeset = build_changeset(params, :update)
     form = to_form(changeset, as: "user")
+    user = Map.merge(user, changeset.changes)
+    user_map = Map.from_struct(user)
+    send_update(RegistrationComponent, id: "registration-component", user: user_map)
+    send_update(AuthenticationComponent, id: "authentication-component", user: user_map)
 
     {
       :noreply,
       socket
       |> assign(:form, form)
+      |> assign(:user, user)
     }
   end
 
@@ -73,7 +67,10 @@ defmodule DemoWeb.Live.SignIn do
   end
 
   def handle_info({:registration_successful, params}, socket) do
-    multi = build_new_user_multi(params)
+    multi =
+      params
+      |> Enum.into(%{})
+      |> build_new_user_multi()
 
     case Repo.transaction(multi) do
       {:ok, %{user: user, key: _key, token: token}} ->
@@ -252,10 +249,12 @@ defmodule DemoWeb.Live.SignIn do
   end
 
   defp build_new_user_multi(params) do
+    %{key: key_params, user: user_params} = params
+
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:user, %User{})
+    |> Ecto.Multi.insert(:user, User.changeset(%User{}, user_params))
     |> Ecto.Multi.insert(:key, fn %{user: user} ->
-      {:ok, attrs} = build_new_user_key_attrs(params, user)
+      {:ok, attrs} = build_new_user_key_attrs(key_params, user)
       UserKey.new_changeset(%UserKey{}, attrs)
     end)
     |> Ecto.Multi.insert(:token, fn %{user: user} ->

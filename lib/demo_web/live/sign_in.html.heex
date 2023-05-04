@@ -5,11 +5,11 @@
         You may sign into <strong>Demo</strong> using a Passkey, which is more secure than a password.
       </p>
 
-      <.simple_form for={@form} class="flex gap-2">
+      <.simple_form for={@form} phx-change="validate-email" class="flex gap-2">
         <.live_component module={SupportComponent} id="support-component" />
         <.live_component module={TokenComponent} id="token-component" />
 
-        <.input type="text" field={{@form, :username}} label="Username" phx-change="validate-username" phx-debounce="500" />
+        <.input type="email" field={{@form, :email}} label="Email" phx-debounce="500" />
 
         <:actions>
           <.live_component
