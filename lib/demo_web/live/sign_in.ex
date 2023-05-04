@@ -5,6 +5,7 @@ defmodule DemoWeb.Live.SignIn do
   Documentation may be found on [HexDocs](https://hexdocs.pm/webauthn_live_component/WebauthnComponents.html). See the [source code](https://github.com/liveshowy/webauthn_live_component_demo/blob/main/lib/demo_web/live/sign_in.ex) for complete implementation details.
   """
   use DemoWeb, :live_view
+  import Ecto.Changeset
   require Logger
   alias Demo.Accounts.User
   alias Demo.Authentication
@@ -19,37 +20,43 @@ defmodule DemoWeb.Live.SignIn do
   @user_profile_path "/user/profile"
 
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    changeset = build_changeset(%{"username" => nil})
+    form = to_form(changeset, as: "user")
+
+    {
+      :ok,
+      socket
+      |> assign(:form, form)
+    }
   end
 
-  def render(assigns) do
-    ~H"""
-    <section class="flex flex-col gap-4">
-      <h1 class="text-3xl">Passkey Sign In</h1>
+  defp build_changeset(params, action \\ nil) do
+    data = %{}
+    types = %{username: :string}
+    fields = Map.keys(types)
 
-      <p class="text-lg">
-        You may sign into <strong>Demo</strong> using a Passkey, which is more secure than a password.
-      </p>
+    changeset =
+      {data, types}
+      |> cast(params, fields)
+      |> validate_required(fields)
+      |> validate_length(:username, min: 3, max: 80)
 
-      <section class="flex gap-2">
-        <.live_component module={SupportComponent} id="support-component" />
-        <.live_component module={TokenComponent} id="token-component" />
+    if action do
+      apply_action(changeset, action)
+    else
+      changeset
+    end
+  end
 
-        <.live_component
-          module={RegistrationComponent}
-          app={:demo}
-          id="registration-component"
-          class="px-2 py-1 border border-gray-300 hover:border-transparent bg-gray-200 hover:bg-blue-200 focus:bg-blue-300 text-gray-900 transition rounded text-base shadow-sm flex gap-2 items-center hover:-translate-y-px hover:shadow-md"
-          />
+  def handle_event("validate-username", params, socket) do
+    changeset = build_changeset(params, :update)
+    form = to_form(changeset, as: "user")
 
-        <.live_component
-          module={AuthenticationComponent}
-          id="authentication-component"
-          class="px-2 py-1 border border-gray-300 hover:border-transparent bg-gray-200 hover:bg-blue-200 focus:bg-blue-300 text-gray-900 transition rounded text-base shadow-sm flex gap-2 items-center hover:-translate-y-px hover:shadow-md"
-          />
-      </section>
-    </section>
-    """
+    {
+      :noreply,
+      socket
+      |> assign(:form, form)
+    }
   end
 
   def handle_info({:passkeys_supported, boolean}, socket) do
