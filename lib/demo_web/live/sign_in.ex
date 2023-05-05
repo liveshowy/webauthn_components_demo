@@ -124,8 +124,8 @@ defmodule DemoWeb.Live.SignIn do
     }
   end
 
-  def handle_info({:find_credentials, user_handle: user_handle}, socket) do
-    user_key = Authentication.get_user_key_by_user_handle(user_handle, [:user])
+  def handle_info({:find_credentials, key_id: key_id}, socket) do
+    user_key = Authentication.get_user_key_by_key_id(key_id, [:user])
 
     case user_key do
       %UserKey{} ->
@@ -133,7 +133,7 @@ defmodule DemoWeb.Live.SignIn do
         {:noreply, socket}
 
       _ ->
-        Logger.error(authentication_failure: {:user_handle, user_handle})
+        Logger.error(authentication_failure: {:user_key, user_key})
 
         {
           :noreply,
