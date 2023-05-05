@@ -124,7 +124,7 @@ defmodule DemoWeb.Live.SignIn do
     }
   end
 
-  def handle_info({:find_credentials, key_id: key_id}, socket) do
+  def handle_info({:find_credential, key_id: key_id}, socket) do
     user_key = Authentication.get_user_key_by_key_id(key_id, [:user])
 
     case user_key do
