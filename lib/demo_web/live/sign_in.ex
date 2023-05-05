@@ -15,6 +15,7 @@ defmodule DemoWeb.Live.SignIn do
   alias WebauthnComponents.RegistrationComponent
   alias WebauthnComponents.SupportComponent
   alias WebauthnComponents.TokenComponent
+  alias WebauthnComponents.WebauthnUser
 
   @user_profile_path "/user/profile"
 
@@ -41,9 +42,20 @@ defmodule DemoWeb.Live.SignIn do
 
     form = to_form(changeset, as: "user")
     user = Map.merge(user, changeset.changes)
-    user_map = Map.from_struct(user)
-    send_update(RegistrationComponent, id: "registration-component", user: user_map)
-    send_update(AuthenticationComponent, id: "authentication-component", user: user_map)
+    user_id = user.id || :crypto.strong_rand_bytes(64)
+
+    webauthn_user = %WebauthnUser{
+      id: Base.encode64(user_id, padding: false),
+      name: user.email,
+      display_name: user.email
+    }
+
+    send_update(RegistrationComponent, id: "registration-component", webauthn_user: webauthn_user)
+
+    send_update(AuthenticationComponent,
+      id: "authentication-component",
+      webauthn_user: webauthn_user
+    )
 
     {
       :noreply,
@@ -67,10 +79,9 @@ defmodule DemoWeb.Live.SignIn do
   end
 
   def handle_info({:registration_successful, params}, socket) do
-    multi =
-      params
-      |> Enum.into(%{})
-      |> build_new_user_multi()
+    %{user: user} = socket.assigns
+    user = Map.from_struct(user)
+    multi = build_new_user_multi(%{key: params[:key], user: user})
 
     case Repo.transaction(multi) do
       {:ok, %{user: user, key: _key, token: token}} ->
