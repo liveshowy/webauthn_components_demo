@@ -15,41 +15,54 @@ defmodule DemoWeb.Live.SignIn do
   alias WebauthnComponents.RegistrationComponent
   alias WebauthnComponents.SupportComponent
   alias WebauthnComponents.TokenComponent
+  alias WebauthnComponents.WebauthnUser
 
   @user_profile_path "/user/profile"
 
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    user = %User{}
+    changeset = User.changeset(user, %{"email" => nil})
+    form = to_form(changeset, as: "user")
+
+    {
+      :ok,
+      socket
+      |> assign(:form, form)
+      |> assign(:user, user)
+    }
   end
 
-  def render(assigns) do
-    ~H"""
-    <section class="flex flex-col gap-4">
-      <h1 class="text-3xl">Passkey Sign In</h1>
+  def handle_event("validate-email", %{"user" => params}, socket) do
+    %{user: user} = socket.assigns
 
-      <p class="text-lg">
-        You may sign into <strong>Demo</strong> using a Passkey, which is more secure than a password.
-      </p>
+    changeset =
+      user
+      |> User.changeset(params)
+      |> Map.put(:action, :insert)
 
-      <section class="flex gap-2">
-        <.live_component module={SupportComponent} id="support-component" />
-        <.live_component module={TokenComponent} id="token-component" />
+    form = to_form(changeset, as: "user")
+    user = Map.merge(user, changeset.changes)
+    user_id = user.id || :crypto.strong_rand_bytes(64)
 
-        <.live_component
-          module={RegistrationComponent}
-          app={:demo}
-          id="registration-component"
-          class="px-2 py-1 border border-gray-300 hover:border-transparent bg-gray-200 hover:bg-blue-200 focus:bg-blue-300 text-gray-900 transition rounded text-base shadow-sm flex gap-2 items-center hover:-translate-y-px hover:shadow-md"
-          />
+    webauthn_user = %WebauthnUser{
+      id: Base.encode64(user_id, padding: false),
+      name: user.email,
+      display_name: user.email
+    }
 
-        <.live_component
-          module={AuthenticationComponent}
-          id="authentication-component"
-          class="px-2 py-1 border border-gray-300 hover:border-transparent bg-gray-200 hover:bg-blue-200 focus:bg-blue-300 text-gray-900 transition rounded text-base shadow-sm flex gap-2 items-center hover:-translate-y-px hover:shadow-md"
-          />
-      </section>
-    </section>
-    """
+    send_update(RegistrationComponent, id: "registration-component", webauthn_user: webauthn_user)
+
+    send_update(AuthenticationComponent,
+      id: "authentication-component",
+      webauthn_user: webauthn_user
+    )
+
+    {
+      :noreply,
+      socket
+      |> assign(:form, form)
+      |> assign(:user, user)
+    }
   end
 
   def handle_info({:passkeys_supported, boolean}, socket) do
@@ -66,7 +79,9 @@ defmodule DemoWeb.Live.SignIn do
   end
 
   def handle_info({:registration_successful, params}, socket) do
-    multi = build_new_user_multi(params)
+    %{user: user} = socket.assigns
+    user = Map.from_struct(user)
+    multi = build_new_user_multi(%{key: params[:key], user: user})
 
     case Repo.transaction(multi) do
       {:ok, %{user: user, key: _key, token: token}} ->
@@ -109,8 +124,8 @@ defmodule DemoWeb.Live.SignIn do
     }
   end
 
-  def handle_info({:find_credentials, user_handle: user_handle}, socket) do
-    user_key = Authentication.get_user_key_by_user_handle(user_handle, [:user])
+  def handle_info({:find_credential, key_id: key_id}, socket) do
+    user_key = Authentication.get_user_key_by_key_id(key_id, [:user])
 
     case user_key do
       %UserKey{} ->
@@ -118,7 +133,7 @@ defmodule DemoWeb.Live.SignIn do
         {:noreply, socket}
 
       _ ->
-        Logger.error(authentication_failure: {:user_handle, user_handle})
+        Logger.error(authentication_failure: {:user_key, user_key})
 
         {
           :noreply,
@@ -245,10 +260,12 @@ defmodule DemoWeb.Live.SignIn do
   end
 
   defp build_new_user_multi(params) do
+    %{key: key_params, user: user_params} = params
+
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:user, %User{})
+    |> Ecto.Multi.insert(:user, User.changeset(%User{}, user_params))
     |> Ecto.Multi.insert(:key, fn %{user: user} ->
-      {:ok, attrs} = build_new_user_key_attrs(params, user)
+      {:ok, attrs} = build_new_user_key_attrs(key_params, user)
       UserKey.new_changeset(%UserKey{}, attrs)
     end)
     |> Ecto.Multi.insert(:token, fn %{user: user} ->

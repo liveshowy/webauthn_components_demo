@@ -19,8 +19,10 @@ defmodule Demo.Accounts do
       [%User{}, ...]
 
   """
-  def list_users do
-    Repo.all(User)
+  def list_users(preloads \\ []) do
+    User
+    |> Repo.all()
+    |> Repo.preload(preloads)
   end
 
   @doc """

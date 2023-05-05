@@ -180,6 +180,7 @@ defmodule DemoWeb.CoreComponents do
   """
   attr :for, :any, default: nil, doc: "the datastructure for the form"
   attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+  attr :class, :string, default: nil
 
   attr :rest, :global,
     include: ~w(autocomplete name rel action enctype method novalidate target),
@@ -190,12 +191,10 @@ defmodule DemoWeb.CoreComponents do
 
   def simple_form(assigns) do
     ~H"""
-    <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
-        <%= render_slot(@inner_block, f) %>
-        <div :for={action <- @actions} class="flex items-center justify-between gap-6 mt-2">
-          <%= render_slot(action, f) %>
-        </div>
+    <.form :let={f} for={@for} as={@as} class={["flex flex-col gap-2", @class]} {@rest}>
+      <%= render_slot(@inner_block, f) %>
+      <div :for={action <- @actions} class="flex items-center justify-between gap-6">
+        <%= render_slot(action, f) %>
       </div>
     </.form>
     """
@@ -348,7 +347,7 @@ defmodule DemoWeb.CoreComponents do
         value={@value}
         class={[
           input_border(@errors),
-          "block w-full rounded-full border-zinc-300 py-1 px-3",
+          "block w-full rounded border-zinc-300 py-1 px-3",
           "text-zinc-900 focus:outline-none focus:ring-4 sm:text-sm sm:leading-6",
           "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5"
         ]}
@@ -373,7 +372,7 @@ defmodule DemoWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block px-3 text-sm font-semibold leading-6 cursor-pointer text-zinc-500">
+    <label for={@for} class="block text-sm font-semibold leading-6 cursor-pointer text-zinc-500">
       <%= render_slot(@inner_block) %>
     </label>
     """
