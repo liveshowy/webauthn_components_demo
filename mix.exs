@@ -4,7 +4,7 @@ defmodule Demo.MixProject do
   def project do
     [
       app: :demo,
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -51,7 +51,6 @@ defmodule Demo.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      # {:webauthn_components, path: "../webauthn_components"}
       {:webauthn_components, "~> 0.4"}
     ]
   end
