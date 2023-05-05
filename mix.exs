@@ -51,10 +51,8 @@ defmodule Demo.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:webauthn_components, path: "../webauthn_components"}
-      # {:webauthn_components,
-      #  git: "https://github.com/liveshowy/webauthn_components.git", branch: "email-support"}
-      # {:webauthn_components, "~> 0.3"}
+      # {:webauthn_components, path: "../webauthn_components"}
+      {:webauthn_components, "~> 0.4"}
     ]
   end
 
