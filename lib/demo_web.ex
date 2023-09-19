@@ -39,7 +39,6 @@ defmodule DemoWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        namespace: DemoWeb,
         formats: [:html, :json],
         layouts: [html: DemoWeb.Layouts]
 
@@ -53,8 +52,7 @@ defmodule DemoWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {DemoWeb.Layouts, :app},
-        container: {:div, class: "contents"}
+        layout: {DemoWeb.Layouts, :app}
 
       unquote(html_helpers())
     end

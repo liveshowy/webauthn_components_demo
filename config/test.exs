@@ -17,7 +17,7 @@ config :demo, Demo.Repo,
 # you can enable the server option below.
 config :demo, DemoWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "Z4utlBHoa/cthnKHUf9WM8T6s7laBSFi1ReH/X+j9MumjE9Yg1YBQR4lBlFJerCL",
+  secret_key_base: "dcDXE9Kn1Ngig21lNdoiUMNyzYKtMvxotZNNJfcXF/0/B9K12sSr3lIyrsRQMcRK",
   server: false
 
 # In test we don't send emails.

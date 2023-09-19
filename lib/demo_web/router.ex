@@ -1,13 +1,20 @@
 defmodule DemoWeb.Router do
   use DemoWeb, :router
 
+  (
+    alias DemoWeb.SessionHooks.AssignUser
+    alias DemoWeb.SessionHooks.RequireUser
+    import DemoWeb.Session, only: [fetch_current_user: 2]
+  )
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {DemoWeb.Layouts, :root}
+    plug :put_root_layout, html: {DemoWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -20,21 +27,30 @@ defmodule DemoWeb.Router do
     get "/", PageController, :home
   end
 
-  live_session :default, on_mount: {DemoWeb.Hooks.User, :assign_user} do
+  # HTTP controller routes
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    post "/session", Session, :create
+    delete "/session", Session, :delete
+  end
+
+  # Unprotected LiveViews
+  live_session :guest, on_mount: [AssignUser] do
     scope "/", DemoWeb do
       pipe_through :browser
 
-      live "/sign-in", Live.SignIn
-      live "/sign-out", Live.SignOut, :sign_out
+      live "/sign-in", AuthenticationLive
     end
   end
 
-  live_session :authenticated,
-    on_mount: [{DemoWeb.Hooks.User, :assign_user}, {DemoWeb.Hooks.User, :require_user}] do
-    scope "/user", DemoWeb do
+  # Protected LiveViews
+  live_session :authenticated, on_mount: [AssignUser, RequireUser] do
+    scope "/", DemoWeb do
       pipe_through :browser
 
-      live "/profile", Live.UserProfile
+      # Example
+      # live "/room/:room_id", RoomLive
     end
   end
 
