@@ -50,7 +50,8 @@ defmodule Demo.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:webauthn_components, "~> 0.6"}
+      {:webauthn_components, path: "../webauthn_components"}
+      # {:webauthn_components, "~> 0.6"}
     ]
   end
 
