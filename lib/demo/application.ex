@@ -12,12 +12,15 @@ defmodule Demo.Application do
       DemoWeb.Telemetry,
       # Start the Ecto repository
       Demo.Repo,
+      # Start the UserTokenCleaner
+      {Demo.UserTokenCleaner, interval_minutes: 10},
       # Start the PubSub system
       {Phoenix.PubSub, name: Demo.PubSub},
       # Start Finch
       {Finch, name: Demo.Finch},
       # Start the Endpoint (http/https)
       DemoWeb.Endpoint
+
       # Start a worker by calling: Demo.Worker.start_link(arg)
       # {Demo.Worker, arg}
     ]
