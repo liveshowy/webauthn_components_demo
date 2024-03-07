@@ -50,6 +50,10 @@ defmodule Demo.Identity.UserKey do
     |> cast(attrs, fields)
     |> validate_required([:user_id, :key_id, :public_key, :label])
     |> foreign_key_constraint(:user_id)
+    |> unsafe_validate_unique([:user_id, :label], Demo.Repo,
+      message: "label already taken",
+      error_key: :label
+    )
     |> unique_constraint([:user_id, :label], message: "label already taken")
     |> unique_constraint([:key_id], message: "key already registered")
     |> put_last_used_at()
