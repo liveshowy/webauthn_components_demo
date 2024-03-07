@@ -8,4 +8,5 @@
 
   <%!-- Authenticated Routes --%>
   <.nav_link :if={@current_user} href={~p"/session"} method="delete">Sign Out</.nav_link>
+  <.nav_link :if={@current_user} href={~p"/settings"}>Settings</.nav_link>
 </nav>

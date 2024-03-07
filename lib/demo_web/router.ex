@@ -51,6 +51,7 @@ defmodule DemoWeb.Router do
 
       # Example
       # live "/room/:room_id", RoomLive
+      live "/settings", SettingsLive
     end
   end
 
