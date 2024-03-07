@@ -2,10 +2,12 @@ defmodule Demo.Identity do
   @moduledoc """
   Functions for managing users.
   """
-  alias Ecto.Changeset
-  alias Demo.Repo
   alias Demo.Identity.User
+  alias Demo.Identity.UserKey
   alias Demo.Identity.UserToken
+  alias Demo.Repo
+  alias Ecto.Changeset
+
   import Ecto.Query
 
   @token_expiration {24, :hour}
@@ -53,7 +55,7 @@ defmodule Demo.Identity do
     {expiration, unit} = @token_expiration
 
     NaiveDateTime.utc_now()
-      |> NaiveDateTime.add(-expiration, unit)
+    |> NaiveDateTime.add(-expiration, unit)
   end
 
   @doc """
@@ -161,5 +163,17 @@ defmodule Demo.Identity do
   def delete_all_user_sessions(user_id) do
     from(token in UserToken, where: token.user_id == ^user_id and token.type == :session)
     |> Repo.delete_all()
+  end
+
+  # USER KEYS
+
+  @doc """
+  Inserts a new `UserKey` into the repo.
+  """
+  @spec create_key(attrs :: map()) :: {:ok, UserKey.t()} | {:error, Changeset.t()}
+  def create_key(attrs) do
+    %UserKey{}
+    |> UserKey.new_changeset(attrs)
+    |> Repo.insert()
   end
 end

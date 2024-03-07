@@ -29,6 +29,23 @@ defmodule Demo.IdentityFixtures do
     user
   end
 
+  def register_default_key(user) do
+    [user_id: user.id]
+    |> user_key_attrs()
+    |> Identity.create_key()
+
+    user
+  end
+
+  def sign_in_user(user, conn) do
+    {:ok, token} = Identity.create_token(%{user_id: user.id})
+
+    conn
+    |> Plug.Test.init_test_session(%{})
+    |> Plug.Conn.put_session(:user_token, Base.encode64(token.value))
+    |> Plug.Conn.put_session(:user_id, user.id)
+  end
+
   # WebauthnComponents Structs
 
   def webauthn_user(attrs \\ []) do
