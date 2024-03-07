@@ -7,12 +7,11 @@ defmodule Demo.IdentityTest do
   alias Demo.Identity.UserKey
   alias Demo.Identity.UserToken
 
-
   describe "list/1" do
     setup do
       users =
-      Stream.repeatedly(fn -> IdentityFixtures.user_fixture() end)
-      |> Enum.take(10)
+        Stream.repeatedly(fn -> IdentityFixtures.user_fixture() end)
+        |> Enum.take(10)
 
       %{users: users}
     end
@@ -135,6 +134,37 @@ defmodule Demo.IdentityTest do
       assert {:ok, deleted_user} = Identity.delete(user)
       assert deleted_user.id == user.id
       assert deleted_user.email == user.email
+    end
+  end
+
+  describe "create_key/1" do
+    setup do
+      user = IdentityFixtures.user_fixture()
+
+      %{user: user}
+    end
+
+    test "returns error with invalid params" do
+      assert {:error, changeset} = Identity.create_key(%{})
+      assert %Ecto.Changeset{valid?: false, errors: errors} = changeset
+      assert {"can't be blank", _} = errors[:user_id]
+    end
+
+    test "returns error with duplicate label for user", %{user: user} do
+      key_1 = IdentityFixtures.user_key_attrs(user_id: user.id)
+      key_2 = IdentityFixtures.user_key_attrs(user_id: user.id)
+
+      {:ok, _key} = Identity.create_key(key_1)
+      {:error, changeset} = Identity.create_key(key_2)
+      assert %Ecto.Changeset{valid?: false, errors: errors} = changeset
+      assert {"label already taken", _} = errors[:label]
+    end
+
+    test "returns success with valid params", %{user: user} do
+      attrs = IdentityFixtures.user_key_attrs(user_id: user.id)
+      assert {:ok, key} = Identity.create_key(attrs)
+      assert %UserKey{} = key
+      assert key.user_id == attrs.user_id
     end
   end
 end
