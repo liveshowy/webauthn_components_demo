@@ -40,6 +40,7 @@ defmodule DemoWeb.Router do
     scope "/", DemoWeb do
       pipe_through :browser
 
+      live "/sign-up", RegistrationLive
       live "/sign-in", AuthenticationLive
     end
   end

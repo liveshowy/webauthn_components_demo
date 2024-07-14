@@ -28,6 +28,7 @@ defmodule DemoWeb.SessionHooks.RequireUser do
   ```
   """
   alias Demo.Identity.User
+  alias Phoenix.LiveView.Socket
   import Phoenix.LiveView
   use DemoWeb, :verified_routes
 
