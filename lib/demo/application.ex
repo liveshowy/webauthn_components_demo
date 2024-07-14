@@ -9,7 +9,9 @@ defmodule Demo.Application do
   def start(_type, _args) do
     children = [
       DemoWeb.Telemetry,
+      # Start the UserTokenCleaner
       Demo.Repo,
+      {Demo.UserTokenCleaner, interval_minutes: 10},
       {DNSCluster, query: Application.get_env(:demo, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Demo.PubSub},
       # Start the Finch HTTP client for sending emails
