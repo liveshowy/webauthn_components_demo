@@ -1,6 +1,12 @@
 defmodule DemoWeb.Router do
   use DemoWeb, :router
 
+  (
+    alias DemoWeb.SessionHooks.AssignUser
+    alias DemoWeb.SessionHooks.RequireUser
+    import DemoWeb.Session, only: [fetch_current_user: 2]
+  )
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +14,7 @@ defmodule DemoWeb.Router do
     plug :put_root_layout, html: {DemoWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -18,6 +25,33 @@ defmodule DemoWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  # HTTP controller routes
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    post "/session", Session, :create
+    delete "/session", Session, :delete
+  end
+
+  # Unprotected LiveViews
+  live_session :guest, on_mount: [AssignUser] do
+    scope "/", DemoWeb do
+      pipe_through :browser
+
+      live "/sign-in", AuthenticationLive
+    end
+  end
+
+  # Protected LiveViews
+  live_session :authenticated, on_mount: [AssignUser, RequireUser] do
+    scope "/", DemoWeb do
+      pipe_through :browser
+
+      # Example
+      # live "/room/:room_id", RoomLive
+    end
   end
 
   # Other scopes may use custom stacks.
