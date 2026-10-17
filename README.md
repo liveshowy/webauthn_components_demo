@@ -1,6 +1,13 @@
 # WebauthnComponents Demo
 
-This repo is a reference implementation of Passkey authentication in a LiveView application.
+This repo is a reference implementation of the `:webauthn_components` package on [Hex.pm](https://hex.pm/packages/webauthn_components).
+
+## Resources
+
+- Hex.pm: [WebauthnComponents](https://hex.pm/packages/webauthn_components)
+- HexDocs: [WebAuthnComponents](https://hexdocs.pm/webauthn_components/)
+- GitHub: [webauthn_components](https://github.com/liveshowy/webauthn_components)
+- Elixir Forum: [WebAuthnComponents](https://elixirforum.com/t/webauthnlivecomponent-passwordless-auth-for-liveview-apps/49941/18)
 
 ## Design Decisions
 
