@@ -2,6 +2,8 @@ defmodule WebauthnComponentsDemoWeb.UserSessionController do
   use WebauthnComponentsDemoWeb, :controller
 
   alias WebauthnComponentsDemo.Accounts
+  alias WebauthnComponentsDemo.Accounts.PublicKeyCredential
+  alias WebauthnComponentsDemo.Accounts.User
   alias WebauthnComponentsDemoWeb.UserAuth
 
   def create(conn, %{"_action" => "confirmed"} = params) do
@@ -43,6 +45,24 @@ defmodule WebauthnComponentsDemoWeb.UserSessionController do
       |> put_flash(:error, "Invalid email or password")
       |> put_flash(:email, String.slice(email, 0, 160))
       |> redirect(to: ~p"/users/log-in")
+    end
+  end
+
+  # passkey login
+  defp create(conn, %{"credential" => credential_params}, info) do
+    %{"credential_id" => credential_id} = credential_params
+    credential_id = Base.url_decode64!(credential_id)
+
+    case Accounts.get_credential(credential_id, [:user]) do
+      %PublicKeyCredential{user: %User{} = user} ->
+        conn
+        |> put_flash(:info, info)
+        |> UserAuth.log_in_user(user, credential_params)
+
+      _ ->
+        conn
+        |> put_flash(:error, "Invalid credential")
+        |> redirect(to: ~p"/users/log-in")
     end
   end
 

@@ -1,6 +1,7 @@
 defmodule WebauthnComponentsDemo.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  alias WebauthnComponentsDemo.Accounts.PublicKeyCredential
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -10,6 +11,8 @@ defmodule WebauthnComponentsDemo.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+
+    has_many :public_key_credentials, PublicKeyCredential
 
     timestamps(type: :utc_datetime)
   end
@@ -122,7 +125,7 @@ defmodule WebauthnComponentsDemo.Accounts.User do
   If there is no user or the user doesn't have a password, we call
   `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%WebauthnComponentsDemo.Accounts.User{hashed_password: hashed_password}, password)
+  def valid_password?(%__MODULE__{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
   end

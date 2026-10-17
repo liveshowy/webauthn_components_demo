@@ -1,4 +1,20 @@
-# WebauthnComponentsDemo
+# WebauthnComponents Demo
+
+This repo is a reference implementation of Passkey authentication in a LiveView application.
+
+## Design Decisions
+
+As a starting point, much of the code in this repo was generated with standard mix tasks:
+
+```elixir
+mix phx.new webauthn_components_demo --binary-id
+...
+mix phx.gen.auth Accounts User users --binary-id --live
+```
+
+These tasks establish the LiveViews and schemas for user registration and authentication with magic email links, as well as server-backed session management. Users may also create a password from the user settings page after successful authentication. This approach enforces email verification, which is a common real-world concern.
+
+## Up & Running
 
 To start your Phoenix server:
 
@@ -6,13 +22,3 @@ To start your Phoenix server:
 * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://phoenix.hexdocs.pm/deployment.html).
-
-## Learn more
-
-* Official website: https://www.phoenixframework.org/
-* Guides: https://phoenix.hexdocs.pm/overview.html
-* Docs: https://phoenix.hexdocs.pm
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix

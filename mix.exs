@@ -73,7 +73,8 @@ defmodule WebauthnComponentsDemo.MixProject do
       {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:webauthn_components, "~> 0.11"}
     ]
   end
 
@@ -90,7 +91,11 @@ defmodule WebauthnComponentsDemo.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind webauthn_components_demo", "esbuild webauthn_components_demo"],
+      "assets.build": [
+        "compile",
+        "tailwind webauthn_components_demo",
+        "esbuild webauthn_components_demo"
+      ],
       "assets.deploy": [
         "tailwind webauthn_components_demo --minify",
         "esbuild webauthn_components_demo --minify",

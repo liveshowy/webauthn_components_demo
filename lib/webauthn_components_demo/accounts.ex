@@ -6,7 +6,7 @@ defmodule WebauthnComponentsDemo.Accounts do
   import Ecto.Query, warn: false
   alias WebauthnComponentsDemo.Repo
 
-  alias WebauthnComponentsDemo.Accounts.{User, UserToken, UserNotifier}
+  alias WebauthnComponentsDemo.Accounts.{User, UserToken, UserNotifier, PublicKeyCredential}
 
   ## Database getters
 
@@ -58,7 +58,11 @@ defmodule WebauthnComponentsDemo.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id, preloads \\ []) do
+    User
+    |> Repo.get!(id)
+    |> Repo.preload(preloads)
+  end
 
   ## User registration
 
@@ -165,6 +169,28 @@ defmodule WebauthnComponentsDemo.Accounts do
     user
     |> User.password_changeset(attrs)
     |> update_user_and_delete_all_tokens()
+  end
+
+  def register_credential(attrs) do
+    %PublicKeyCredential{}
+    |> PublicKeyCredential.register_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def get_credential(credential_id, preloads \\ []) do
+    PublicKeyCredential
+    |> Repo.get(credential_id)
+    |> Repo.preload(preloads)
+  end
+
+  def rename_credential(public_key_credential, attrs) do
+    public_key_credential
+    |> PublicKeyCredential.label_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_credential(public_key_credential) do
+    Repo.delete(public_key_credential)
   end
 
   ## Session
